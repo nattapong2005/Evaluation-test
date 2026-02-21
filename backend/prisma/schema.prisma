@@ -1,0 +1,103 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  EVALUATOR
+  EVALUATEE
+}
+
+enum IndicatorType {
+  SCALE_1_4
+  YES_NO
+}
+
+model User {
+  id       Int    @id @default(autoincrement())
+  email    String @unique
+  password String
+  name     String
+  role     Role
+
+  evaluatorAssignments Assignment[] @relation("Evaluator")
+  evaluateeAssignments Assignment[] @relation("Evaluatee")
+  evidences            Evidence[]
+}
+
+model Evaluation {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  startDate   DateTime
+  endDate     DateTime
+  isOpen      Boolean  @default(false)
+
+  topics      Topic[]
+  assignments Assignment[]
+}
+
+model Topic {
+  id           Int        @id @default(autoincrement())
+  name         String
+  evaluationId Int
+  evaluation   Evaluation @relation(fields: [evaluationId], references: [id], onDelete: Cascade)
+
+  indicators Indicator[]
+}
+
+model Indicator {
+  id              Int           @id @default(autoincrement())
+  name            String
+  topicId         Int
+  topic           Topic         @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  indicatorType   IndicatorType
+  weight          Float
+  requireEvidence Boolean       @default(false)
+
+  scores    Score[]
+  evidences Evidence[]
+}
+
+model Assignment {
+  id           Int        @id @default(autoincrement())
+  evaluationId Int
+  evaluation   Evaluation @relation(fields: [evaluationId], references: [id], onDelete: Cascade)
+  evaluatorId  Int
+  evaluator    User       @relation("Evaluator", fields: [evaluatorId], references: [id], onDelete: Cascade)
+  evaluateeId  Int
+  evaluatee    User       @relation("Evaluatee", fields: [evaluateeId], references: [id], onDelete: Cascade)
+
+  scores Score[]
+
+  @@unique([evaluatorId, evaluateeId, evaluationId])
+}
+
+model Evidence {
+  id          Int       @id @default(autoincrement())
+  indicatorId Int
+  indicator   Indicator @relation(fields: [indicatorId], references: [id], onDelete: Cascade)
+  evaluateeId Int
+  evaluatee   User      @relation(fields: [evaluateeId], references: [id], onDelete: Cascade)
+  fileUrl     String
+  uploadedAt  DateTime  @default(now())
+
+  @@unique([indicatorId, evaluateeId])
+}
+
+model Score {
+  id              Int        @id @default(autoincrement())
+  assignmentId    Int
+  assignment      Assignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  indicatorId     Int
+  indicator       Indicator  @relation(fields: [indicatorId], references: [id], onDelete: Cascade)
+  rawScore        Float
+  calculatedScore Float
+
+  @@unique([assignmentId, indicatorId])
+}

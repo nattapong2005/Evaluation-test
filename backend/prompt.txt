@@ -1,0 +1,11 @@
+ช่วยเขียน Backend API สำหรับ "ระบบประเมินบุคลากร" โดยอ้างอิงข้อกำหนดตามนี้:
+1. โครงสร้างโปรเจกต์ (Project Structure):
+* จัดโครงสร้างแบบ routes/, controllers/, services/, และ middlewares/ * ใช้มาตรฐาน REST API และคืนค่าเป็น JSON 
+2. ระบบความปลอดภัย (Security):
+* ใช้ jsonwebtoken (JWT) สำหรับการพิสูจน์ตัวตน (Bearer Token) * ใช้ bcryptjs ในการ Hash รหัสผ่าน * ติดตั้ง Middleware: cors และ helmet * สร้าง IDOR Guard Middleware เพื่อเช็กสิทธิ์: Admin ดูได้หมด, Evaluator ดูได้เฉพาะงานที่ได้รับมอบหมาย, และ Evaluatee ดูได้เฉพาะผลของตนเอง (ถ้าผิดให้คืน 403) 
+3. ฟีเจอร์ที่ต้องมี (Core Endpoints):
+* Auth: /auth/register (Default role = Evaluatee) และ /auth/login * CRUD Modules: สำหรับ users, topics, indicators, periods, assignments, results, และ evidence * Query Params: ทุกหน้า List ต้องรองรับ ?q= (Search), ?page=, ?pageSize=, และ ?sort=field:asc/desc 
+4. กฎทางธุรกิจและ Validation (Business Logic):
+* Evidence Submit Rule: ในการ PATCH สถานะเป็น submitted หากตัวชี้วัดเป็นชนิด 'yes no' และค่าเป็น 1 แต่ไม่มีไฟล์แนบ ให้คืน 400 EVIDENCE REQUIRED * Unique Assignment: การ POST ไปที่ /assignments ต้องเช็กไม่ให้ (evaluator, evaluatee, period) ซ้ำกัน หากซ้ำให้คืน 409 DUPLICATE ASSIGNMENT * File Upload: ใช้ multer จำกัดขนาดไฟล์ 10MB และเช็กชนิดไฟล์ (ห้าม .exe) 
+5. ระบบรายงาน (Reporting):
+* สร้าง Endpoint /reports/normalized คำนวณคะแนนรวม 60 คะแนน ตามสูตร: r = (score-1)/3 สำหรับ score 1-4 และ 0/1 สำหรับ yes_no พร้อมคูณน้ำหนัก (Weight) * สร้าง Endpoint /reports/progress แสดง % การประเมินที่เสร็จสิ้นแยกตามแผนก 
