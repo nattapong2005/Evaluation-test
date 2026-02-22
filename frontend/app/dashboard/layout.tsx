@@ -41,13 +41,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         router.push("/login")
     }
 
-    if (!user) {
-        return (
-            <div className="min-h-screen flex items-center justify-center bg-zinc-50">
-                <div className="animate-pulse text-zinc-500 font-medium">กำลังโหลดเซสชัน...</div>
-            </div>
-        )
-    }
+if (!user) {
+    return (
+        <div className="min-h-screen flex flex-col items-center justify-center bg-zinc-50 gap-4">
+            <div className="w-12 h-12 border-4 border-zinc-200 border-t-blue-600 rounded-full animate-spin"></div>
+            <p className="text-zinc-500 text-sm">กำลังโหลดข้อมูล...</p>
+        </div>
+    )
+}
 
     return (
         <div className="min-h-screen flex">

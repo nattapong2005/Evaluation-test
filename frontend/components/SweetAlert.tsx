@@ -12,15 +12,18 @@ export const Toast = Swal.mixin({
   },
 });
 
-export const confirmDelete = (callback: () => void) => {
+export const confirmDelete = (
+  callback: () => void,
+  options?: { title?: string; text?: string; confirmButtonText?: string }
+) => {
   Swal.fire({
-    title: 'คุณแน่ใจหรือไม่?',
-    text: "คุณจะไม่สามารถย้อนกลับสิ่งนี้ได้!",
+    title: options?.title || 'คุณแน่ใจหรือไม่?',
+    text: options?.text || "คุณจะไม่สามารถย้อนกลับสิ่งนี้ได้!",
     icon: 'warning',
     showCancelButton: true,
     confirmButtonColor: '#3085d6',
     cancelButtonColor: '#d33',
-    confirmButtonText: 'ใช่, ลบเลย!',
+    confirmButtonText: options?.confirmButtonText || 'ใช่, ลบเลย!',
     cancelButtonText: 'ยกเลิก',
   }).then((result) => {
     if (result.isConfirmed) {

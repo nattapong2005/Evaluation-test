@@ -12,10 +12,14 @@ const storage = multer.diskStorage({
 });
 
 const fileFilter = (req: any, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
-  if (path.extname(file.originalname).toLowerCase() === '.exe') {
-    return cb(new Error('File upload not allowed: .exe files are prohibited.'));
+  const allowedExtensions = ['.jpg', '.jpeg', '.png', '.pdf', '.doc', '.docx', '.xls', '.xlsx'];
+  const ext = path.extname(file.originalname).toLowerCase();
+  
+  if (allowedExtensions.includes(ext)) {
+    cb(null, true);
+  } else {
+    cb(new Error('File type not allowed. Only images, PDFs, and documents are accepted.'));
   }
-  cb(null, true);
 };
 
 export const upload = multer({

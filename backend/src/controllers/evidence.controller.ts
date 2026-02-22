@@ -4,13 +4,17 @@ import prisma from '../utils/prisma';
 export const uploadEvidence = async (req: Request, res: Response): Promise<void> => {
     try {
         const { indicatorId } = req.params;
-        const { fileUrl } = req.body;
         const evaluateeId = (req as any).user!.id;
 
-        if (!fileUrl) {
-            res.status(400).json({ error: 'fileUrl is required' });
+        // req.file is populated by multer middleware
+        if (!req.file) {
+            res.status(400).json({ error: 'No file uploaded or file type not allowed' });
             return;
         }
+        
+        // Construct file URL (assuming local serving or just path for now)
+        // In production this would be an S3 URL or similar.
+        const fileUrl = req.file.path.replace(/\\/g, '/'); // Normalize path
 
         const indId = parseInt(indicatorId as string, 10);
         const indicator = await prisma.indicator.findUnique({

@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { LayoutDashboard, BookOpen, UserCheck, ClipboardList, Users, ShieldAlert, BadgeCheck, User } from "lucide-react"
+import { LayoutDashboard, BookOpen, UserCheck, ClipboardList, Users, ShieldAlert, BadgeCheck, User, BarChart3 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import Cookies from "js-cookie"
 import { useRouter } from "next/navigation" 
@@ -11,6 +11,7 @@ const adminNavs = [
     { name: "ภาพรวมระบบ", href: "/dashboard/admin", icon: LayoutDashboard },
     { name: "จัดการการประเมิน", href: "/dashboard/admin/evaluations", icon: BookOpen },
     { name: "จัดการผู้ใช้งาน", href: "/dashboard/admin/users", icon: Users },
+    { name: "รายงานผล", href: "/dashboard/admin/results", icon: BarChart3 },
 ]
 
 const evaluatorNavs = [

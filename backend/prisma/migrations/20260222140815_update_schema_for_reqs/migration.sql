@@ -1,0 +1,13 @@
+-- AlterTable
+ALTER TABLE `assignment` ADD COLUMN `isActive` BOOLEAN NOT NULL DEFAULT true,
+    ADD COLUMN `status` ENUM('DRAFT', 'SUBMITTED', 'LOCKED') NOT NULL DEFAULT 'DRAFT';
+
+-- AlterTable
+ALTER TABLE `score` ADD COLUMN `remarks` VARCHAR(191) NULL;
+
+-- AlterTable
+ALTER TABLE `topic` ADD COLUMN `isActive` BOOLEAN NOT NULL DEFAULT true,
+    ADD COLUMN `weight` DOUBLE NOT NULL DEFAULT 0;
+
+-- AlterTable
+ALTER TABLE `user` ADD COLUMN `department` VARCHAR(191) NULL;

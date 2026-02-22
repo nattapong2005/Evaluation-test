@@ -18,16 +18,30 @@ enum IndicatorType {
   YES_NO
 }
 
+enum AssignmentStatus {
+  DRAFT
+  SUBMITTED
+  LOCKED
+}
+
+enum EvaluationStatus {
+  ACTIVE
+  CLOSED
+  CANCELLED
+}
+
 model User {
-  id       Int    @id @default(autoincrement())
-  email    String @unique
-  password String
-  name     String
-  role     Role
+  id         Int     @id @default(autoincrement())
+  email      String  @unique
+  password   String
+  name       String
+  role       Role
+  department String?
 
   evaluatorAssignments Assignment[] @relation("Evaluator")
   evaluateeAssignments Assignment[] @relation("Evaluatee")
   evidences            Evidence[]
+  scoreUpdates         ScoreHistory[]
 }
 
 model Evaluation {
@@ -36,7 +50,8 @@ model Evaluation {
   description String?
   startDate   DateTime
   endDate     DateTime
-  isOpen      Boolean  @default(false)
+  isOpen      Boolean          @default(false)
+  status      EvaluationStatus @default(ACTIVE)
 
   topics      Topic[]
   assignments Assignment[]
@@ -45,6 +60,8 @@ model Evaluation {
 model Topic {
   id           Int        @id @default(autoincrement())
   name         String
+  weight       Float      @default(0)
+  isActive     Boolean    @default(true)
   evaluationId Int
   evaluation   Evaluation @relation(fields: [evaluationId], references: [id], onDelete: Cascade)
 
@@ -65,13 +82,15 @@ model Indicator {
 }
 
 model Assignment {
-  id           Int        @id @default(autoincrement())
+  id           Int              @id @default(autoincrement())
   evaluationId Int
-  evaluation   Evaluation @relation(fields: [evaluationId], references: [id], onDelete: Cascade)
+  evaluation   Evaluation       @relation(fields: [evaluationId], references: [id], onDelete: Cascade)
   evaluatorId  Int
-  evaluator    User       @relation("Evaluator", fields: [evaluatorId], references: [id], onDelete: Cascade)
+  evaluator    User             @relation("Evaluator", fields: [evaluatorId], references: [id], onDelete: Cascade)
   evaluateeId  Int
-  evaluatee    User       @relation("Evaluatee", fields: [evaluateeId], references: [id], onDelete: Cascade)
+  evaluatee    User             @relation("Evaluatee", fields: [evaluateeId], references: [id], onDelete: Cascade)
+  status       AssignmentStatus @default(DRAFT)
+  isActive     Boolean          @default(true)
 
   scores Score[]
 
@@ -98,6 +117,22 @@ model Score {
   indicator       Indicator  @relation(fields: [indicatorId], references: [id], onDelete: Cascade)
   rawScore        Float
   calculatedScore Float
+  remarks         String?
+
+  history ScoreHistory[]
 
   @@unique([assignmentId, indicatorId])
+}
+
+model ScoreHistory {
+  id         Int      @id @default(autoincrement())
+  scoreId    Int
+  score      Score    @relation(fields: [scoreId], references: [id], onDelete: Cascade)
+  updaterId  Int
+  updater    User     @relation(fields: [updaterId], references: [id], onDelete: Cascade)
+  oldScore   Float?
+  newScore   Float?
+  oldRemarks String?
+  newRemarks String?
+  createdAt  DateTime @default(now())
 }
